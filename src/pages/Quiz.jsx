@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 
 import Navbar from "../components/Navbar";
 import Timer from "../components/Timer";
-
 import {
     getAllQuestions,
     submitQuizResult
