@@ -1,4 +1,2 @@
-
 AIML-25
-online quiz platform app
-
+online-quiz-platform
