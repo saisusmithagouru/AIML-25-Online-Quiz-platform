@@ -1,261 +1,259 @@
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import {
+  FaBookOpen,
+  FaChartLine,
+  FaTrophy,
+  FaUserGraduate,
+  FaArrowRight
+} from "react-icons/fa";
 
 import Navbar from "../components/Navbar";
-
-import { getUser } from "../services/authService";
-
+import Footer from "../components/Footer";
 import "../styles/Dashboard.css";
+import React, { useEffect, useState } from "react";
+import { getDashboardStats } from "../services/resultService";
+
 
 
 function Dashboard() {
 
-
     const navigate = useNavigate();
 
+    const user = JSON.parse(localStorage.getItem("user"));
+    const [stats, setStats] = useState({
+    quizzesTaken: 0,
+    highestScore: 0,
+    averageScore: 0,
+    rank: 0
+});
+   useEffect(() => {
 
-    const user = getUser();
+    if (user?.role === "ADMIN") {
+        navigate("/admin-dashboard");
+        return;
+    }
 
+    loadDashboardStats();
 
+}, []);
+
+const loadDashboardStats = async () => {
+
+    try {
+
+        const response = await getDashboardStats(user.name);
+
+        setStats(response.data);
+
+    } catch (error) {
+
+        console.log(error);
+
+    }
+
+};
 
     return (
-
         <>
 
-            <Navbar />
+        <Navbar />
 
+        <motion.div
 
-            <div className="dashboard-container">
+        className="dashboard"
 
+        initial={{opacity:0}}
 
+        animate={{opacity:1}}
 
-                <div className="dashboard-header">
+        transition={{duration:.7}}
 
+        >
 
-                    <div>
+        <div className="welcome-card">
 
+        <div>
 
-                        <h1>
+        <h1>
 
-                            Welcome, {user?.name}
+        Welcome,
 
-                        </h1>
+        <span>
 
+        {user?.name}
 
-                        <p>
+        </span>
 
-                            Start your quiz and test your knowledge.
+        👋
 
-                        </p>
+        </h1>
 
+        <p>
 
-                    </div>
+        Ready to improve your knowledge today?
 
+        Challenge yourself with quizzes and track your progress.
 
+        </p>
 
-                </div>
+        </div>
 
+        <FaUserGraduate className="student-icon"/>
 
+        </div>
+        <div className="stats-grid">
 
+<div className="stat-card">
 
+<h2>📚</h2>
 
+<h3>{stats.quizzesTaken}</h3>
 
+<p>Quizzes Taken</p>
 
-                <div className="dashboard-cards">
+</div>
 
+<div className="stat-card">
 
+<h2>🏆</h2>
 
-                    <div className="dashboard-card">
+<h3>{stats.highestScore}%</h3>
 
+<p>Highest Score</p>
 
-                        <h2>
+</div>
 
-                            Start Quiz
+<div className="stat-card">
 
-                        </h2>
+<h2>⭐</h2>
 
+<h3>{stats.averageScore}%</h3>
 
-                        <p>
+<p>Average Score</p>
 
-                            Attempt quizzes and improve your skills.
+</div>
 
-                        </p>
+<div className="stat-card">
 
+<h2>🥇</h2>
 
+<h3>#{stats.rank}</h3>
 
-                        <button
+<p>Your Rank</p>
 
-                            className="dashboard-btn"
+</div>
 
-                            onClick={() => navigate("/quiz")}
+</div>
 
-                        >
+        <div className="dashboard-grid">
 
-                            Start Quiz
+        <motion.div
 
-                        </button>
+        whileHover={{y:-10}}
 
+        className="dashboard-box"
 
+        >
 
-                    </div>
+        <FaBookOpen className="dashboard-icon"/>
 
+        <h2>Start Quiz</h2>
 
+        <p>
 
+        Practice subject-wise quizzes.
 
+        </p>
 
+        <button
 
+        onClick={()=>navigate("/quiz-categories")}
 
+        >
 
-                    <div className="dashboard-card">
+        Start
 
+        <FaArrowRight/>
 
-                        <h2>
+        </button>
 
-                            Leaderboard
+        </motion.div>
 
-                        </h2>
+        <motion.div
 
+        whileHover={{y:-10}}
 
-                        <p>
+        className="dashboard-box"
 
-                            View your ranking and scores.
+        >
 
-                        </p>
+        <FaChartLine className="dashboard-icon"/>
 
+        <h2>Results</h2>
 
+        <p>
 
-                        <button
+        Check your latest performance.
 
-                            className="dashboard-btn"
+        </p>
 
-                            onClick={() => navigate("/leaderboard")}
+        <button
 
-                        >
+        onClick={()=>navigate("/leaderboard")}
 
-                            View Leaderboard
+        >
 
-                        </button>
+        View
 
+        <FaArrowRight/>
 
+        </button>
 
-                    </div>
+        </motion.div>
 
+        <motion.div
 
+        whileHover={{y:-10}}
 
+        className="dashboard-box"
 
+        >
 
+        <FaTrophy className="dashboard-icon"/>
 
+        <h2>Leaderboard</h2>
 
+        <p>
 
+        Compare your ranking with others.
 
-                    {
+        </p>
 
-                    user?.role === "ADMIN" &&
+        <button
 
+        onClick={()=>navigate("/leaderboard")}
 
-                    <div className="dashboard-card">
+        >
 
+        Open
 
-                        <h2>
+        <FaArrowRight/>
 
-                            Admin Panel
+        </button>
 
-                        </h2>
+        </motion.div>
 
+        </div>
 
-                        <p>
+        </motion.div>
 
-                            Add and manage quiz questions.
-
-                        </p>
-
-
-
-                        <button
-
-                            className="dashboard-btn"
-
-                            onClick={() => navigate("/admin")}
-
-                        >
-
-                            Open Admin
-
-                        </button>
-
-
-
-                    </div>
-
-
-                    }
-
-
-
-                </div>
-
-
-
-
-
-
-
-
-
-                <div className="profile-card">
-
-
-                    <h2>
-
-                        Profile Details
-
-                    </h2>
-
-
-
-
-                    <p>
-
-                        <span>Name:</span> {user?.name}
-
-                    </p>
-
-
-
-
-                    <p>
-
-                        <span>Email:</span> {user?.email}
-
-                    </p>
-
-
-
-
-                    <p>
-
-                        <span>Role:</span> {user?.role}
-
-                    </p>
-
-
-
-
-                </div>
-
-
-
-
-
-
-
-            </div>
-
+        <Footer/>
 
         </>
 
     );
 
 }
-
 
 export default Dashboard;

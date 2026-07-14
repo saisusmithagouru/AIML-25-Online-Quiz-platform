@@ -1,24 +1,9 @@
-export const saveUser = (user)=>{
+import api from "./api";
 
-    localStorage.setItem(
-        "user",
-        JSON.stringify(user)
-    );
-
+export const registerUser = async (user) => {
+  return await api.post("/users/register", user);
 };
 
-
-export const getUser = ()=>{
-
-    return JSON.parse(
-        localStorage.getItem("user")
-    );
-
-};
-
-
-export const logout = ()=>{
-
-    localStorage.removeItem("user");
-
+export const loginUser = async (user) => {
+  return await api.post("/users/login", user);
 };

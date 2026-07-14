@@ -1,658 +1,231 @@
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-
-import Navbar from "../components/Navbar";
-import Timer from "../components/Timer";
+import React, { useEffect, useState } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
-    getAllQuestions,
-    submitQuizResult
+  getAllQuestions,
+  getQuestionsByCategory,
 } from "../services/quizService";
-
+import Navbar from "../components/Navbar";
+import Footer from "../components/Footer";
 import "../styles/Quiz.css";
-
+import { saveResult } from "../services/resultService";
 
 function Quiz() {
+  const navigate = useNavigate();
+  const location = useLocation();
 
+  const category = location.state?.category;
 
-    const navigate = useNavigate();
+  const [questions, setQuestions] = useState([]);
+  const [currentQuestion, setCurrentQuestion] = useState(0);
+  const [answers, setAnswers] = useState({});
 
+  useEffect(() => {
+    fetchQuestions();
+  }, []);
 
-    const [questions, setQuestions] = useState([]);
+  const fetchQuestions = async () => {
+    try {
+      let response;
 
-    const [currentQuestion, setCurrentQuestion] = useState(0);
+      if (category) {
+        response = await getQuestionsByCategory(category);
+      } else {
+        response = await getAllQuestions();
+      }
 
-    const [answers, setAnswers] = useState({});
+      setQuestions(response.data);
+    } catch (error) {
+      console.error("Error loading questions:", error);
+      alert("Failed to load questions.");
+    }
+  };
 
-    const [loading, setLoading] = useState(true);
+  const handleOptionChange = (option) => {
+    setAnswers({
+      ...answers,
+      [currentQuestion]: option,
+    });
+  };
 
+  const nextQuestion = () => {
+    if (currentQuestion < questions.length - 1) {
+      setCurrentQuestion(currentQuestion + 1);
+    }
+  };
 
+  const previousQuestion = () => {
+    if (currentQuestion > 0) {
+      setCurrentQuestion(currentQuestion - 1);
+    }
+  };
 
+  const submitQuiz = async () => {
 
+    let correct = 0;
 
+    questions.forEach((question, index) => {
 
-    // Load questions
-
-    useEffect(() => {
-
-
-        getAllQuestions()
-
-        .then((response)=>{
-
-
-            setQuestions(response.data);
-
-            setLoading(false);
-
-
-        })
-
-        .catch(()=>{
-
-
-            alert("Unable to load questions");
-
-            setLoading(false);
-
-
-        });
-
-
-    }, []);
-
-
-
-
-
-
-
-
-    // Select answer
-
-    const selectAnswer = (answer)=>{
-
-
-        setAnswers({
-
-            ...answers,
-
-            [currentQuestion]: answer
-
-        });
-
-
-    };
-
-
-
-
-
-
-
-
-    // Next question
-
-    const nextQuestion = ()=>{
-
-
-        if(currentQuestion < questions.length - 1){
-
-
-            setCurrentQuestion(
-
-                currentQuestion + 1
-
-            );
-
-
+        if (answers[index] === question.rightAnswer) {
+            correct++;
         }
 
+    });
 
-    };
+    const total = questions.length;
+    const wrong = total - correct;
+    const percentage =
+        total > 0 ? Math.round((correct / total) * 100) : 0;
 
+    const user = JSON.parse(localStorage.getItem("user"));
 
+    try {
 
+        await saveResult({
 
+            studentName: user.name,
 
+            category: category || "General",
 
+            totalQuestions: total,
 
+            correctAnswers: correct,
 
-    // Previous question
+            wrongAnswers: wrong,
 
-    const previousQuestion = ()=>{
-
-
-        if(currentQuestion > 0){
-
-
-            setCurrentQuestion(
-
-                currentQuestion - 1
-
-            );
-
-
-        }
-
-
-    };
-
-
-
-
-
-
-
-
-
-    // Submit quiz
-
-    const submitQuiz = ()=>{
-
-
-        let score = 0;
-
-
-
-        questions.forEach((question,index)=>{
-
-
-            if(
-
-                answers[index] === question.rightAnswer
-
-            ){
-
-                score++;
-
-            }
-
+            percentage: percentage
 
         });
 
+    } catch (error) {
 
-
-
-
-
-        const user = JSON.parse(
-
-            localStorage.getItem("user")
-
-        );
-
-
-
-
-
-        const result = {
-
-
-            userId:user.id,
-
-
-            score:score,
-
-
-            totalQuestions:questions.length
-
-
-        };
-
-
-
-
-
-
-
-        submitQuizResult(result)
-
-        .then(()=>{
-
-
-
-            localStorage.setItem(
-
-                "score",
-
-                score
-
-            );
-
-
-
-            localStorage.setItem(
-
-                "total",
-
-                questions.length
-
-            );
-
-
-
-            navigate("/result");
-
-
-
-        })
-
-
-        .catch(()=>{
-
-
-            alert(
-
-                "Unable to save result"
-
-            );
-
-
-        });
-
-
-
-    };
-
-
-
-
-
-
-
-
-
-    if(loading){
-
-
-        return (
-
-            <div className="loading">
-
-                Loading Questions...
-
-            </div>
-
-        );
-
+        console.error("Result Save Failed", error);
 
     }
 
-
-
-
-
-
-
-    if(questions.length===0){
-
-
-        return (
-
-            <div className="loading">
-
-                No Questions Found
-
-            </div>
-
-        );
-
-
+    navigate("/completed", {
+    state: {
+        total,
+        correct,
+        wrong,
+        percentage
     }
+});
+    
 
+};
 
+  if (questions.length === 0) {
+  return (
+    <>
+      <Navbar />
+      <div className="loading-container">
+        <div className="loader"></div>
+        <h2>Loading Quiz...</h2>
+      </div>
+      <Footer />
+    </>
+  );
+}
 
+  const question = questions[currentQuestion];
 
+  return (
+    <>
+      <Navbar />
 
+      <div className="quiz-container">
 
+<div className="progress-bar">
 
-    const question = questions[currentQuestion];
+<div
+className="progress-fill"
+style={{
+width:`${((currentQuestion+1)/questions.length)*100}%`
+}}
+></div>
 
+</div>
 
+<div className="question-count">
 
+Question {currentQuestion+1} of {questions.length}
 
+</div>
 
+<div className="question-card">
 
-    return (
+<h2>
+{question.questionTitle}
+</h2>
 
-        <>
+<div className="options">
 
+{[
+question.option1,
+question.option2,
+question.option3,
+question.option4
+].map((option,index)=>(
 
-        <Navbar />
+<label
+key={index}
+className={`option ${
+answers[currentQuestion]===option?"selected":""
+}`}
+>
 
+<input
+type="radio"
+name="option"
+checked={answers[currentQuestion]===option}
+onChange={()=>handleOptionChange(option)}
+/>
 
+{option}
 
-        <div className="quiz-page">
+</label>
 
+))}
 
+</div>
 
-            <div className="quiz-container">
+<div className="buttons">
 
+<button
+onClick={previousQuestion}
+disabled={currentQuestion===0}
+>
+Previous
+</button>
 
+{currentQuestion===questions.length-1?
 
+<button
+className="submit-btn"
+onClick={submitQuiz}
+>
+Submit Quiz
+</button>
 
+:
 
-                <div className="quiz-header">
-
-
-                    <h2>
-
-                        Online Quiz
-
-                    </h2>
-
-
-
-                    <div className="timer-box">
-
-
-                        <Timer
-
-                            duration={300}
-
-                            onTimeUp={submitQuiz}
-
-                        />
-
-
-                    </div>
-
-
-
-                </div>
-
-
-
-
-
-
-
-
-                <p className="question-number">
-
-
-                    Question {currentQuestion + 1}
-
-                    {" "}of{" "}
-
-                    {questions.length}
-
-
-                </p>
-
-
-
-
-
-
-
-
-
-                <h2 className="question-title">
-
-
-                    {question.questionTitle}
-
-
-                </h2>
-
-
-
-
-
-
-
-
-
-                <div className="options-container">
-
-
-
-
-
-                    <button
-
-                    className={
-
-                    answers[currentQuestion] === question.option1
-
-                    ?
-
-                    "option-button selected"
-
-                    :
-
-                    "option-button"
-
-                    }
-
-
-                    onClick={()=>selectAnswer(question.option1)}
-
-                    >
-
-                        {question.option1}
-
-
-                    </button>
-
-
-
-
-
-
-
-                    <button
-
-                    className={
-
-                    answers[currentQuestion] === question.option2
-
-                    ?
-
-                    "option-button selected"
-
-                    :
-
-                    "option-button"
-
-                    }
-
-
-                    onClick={()=>selectAnswer(question.option2)}
-
-                    >
-
-                        {question.option2}
-
-
-                    </button>
-
-
-
-
-
-
-
-
-                    <button
-
-                    className={
-
-                    answers[currentQuestion] === question.option3
-
-                    ?
-
-                    "option-button selected"
-
-                    :
-
-                    "option-button"
-
-                    }
-
-
-                    onClick={()=>selectAnswer(question.option3)}
-
-                    >
-
-                        {question.option3}
-
-
-                    </button>
-
-
-
-
-
-
-
-
-                    <button
-
-                    className={
-
-                    answers[currentQuestion] === question.option4
-
-                    ?
-
-                    "option-button selected"
-
-                    :
-
-                    "option-button"
-
-                    }
-
-
-                    onClick={()=>selectAnswer(question.option4)}
-
-                    >
-
-                        {question.option4}
-
-
-                    </button>
-
-
-
-
-
-                </div>
-
-
-
-
-
-
-
-
-
-                <div className="quiz-actions">
-
-
-
-
-
-                    <button
-
-                    className="quiz-btn"
-
-                    disabled={currentQuestion===0}
-
-                    onClick={previousQuestion}
-
-                    >
-
-                        Previous
-
-
-                    </button>
-
-
-
-
-
-
-
-
-
-                    {
-
-                    currentQuestion === questions.length - 1
-
-                    ?
-
-                    (
-
-                    <button
-
-                    className="quiz-btn submit-btn"
-
-                    onClick={submitQuiz}
-
-                    >
-
-                        Submit Quiz
-
-
-                    </button>
-
-
-                    )
-
-                    :
-
-                    (
-
-                    <button
-
-                    className="quiz-btn"
-
-                    onClick={nextQuestion}
-
-                    >
-
-                        Next
-
-
-                    </button>
-
-
-                    )
-
-
-                    }
-
-
-
-
-
-                </div>
-
-
-
-
-
-
-
-            </div>
-
-
-
-
-
-        </div>
-
-
-
-        </>
-
-
-    );
+<button
+onClick={nextQuestion}
+>
+Next
+</button>
 
 }
 
+</div>
 
+</div>
+
+</div>
+
+      <Footer />
+    </>
+  );
+}
 
 export default Quiz;

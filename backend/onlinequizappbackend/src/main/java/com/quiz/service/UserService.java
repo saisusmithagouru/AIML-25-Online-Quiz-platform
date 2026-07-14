@@ -36,13 +36,28 @@ public class UserService {
         User user = userRepository.findByEmail(request.getEmail()).orElse(null);
 
         if (user == null) {
-            return new LoginResponse("User not found", null);
+            return new LoginResponse(
+                    "User not found",
+                    null,
+                    null,
+                    null
+            );
         }
 
         if (!user.getPassword().equals(request.getPassword())) {
-            return new LoginResponse("Invalid Password", null);
+            return new LoginResponse(
+                    "Invalid Password",
+                    null,
+                    null,
+                    null
+            );
         }
 
-        return new LoginResponse("Login Successful", user.getRole());
+        return new LoginResponse(
+                "Login Successful",
+                user.getName(),
+                user.getEmail(),
+                user.getRole()
+        );
     }
 }

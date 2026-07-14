@@ -1,91 +1,26 @@
 import api from "./api";
 
-
-// Get all quiz questions
-
-export const getAllQuestions = () => {
-
-    return api.get("/questions/all");
-
+// Get all questions
+export const getAllQuestions = async () => {
+  return await api.get("/questions/all");
 };
 
-
-
-
-// Get questions by category (if backend supports it)
-
-export const getQuestionsByCategory = (category) => {
-
-    return api.get(
-        `/questions/category/${category}`
-    );
-
+// Get questions by category
+export const getQuestionsByCategory = async (category) => {
+  return await api.get(`/questions/category/${category}`);
 };
 
-
-
-
-// Add new question (Admin)
-
-export const addQuestion = (question) => {
-
-    return api.post(
-        "/questions/add",
-        question
-    );
-
+// Add question
+export const addQuestion = async (question) => {
+  return await api.post("/questions/add", question);
 };
 
-
-
-
-// Update question (Admin)
-
-export const updateQuestion = (id, question) => {
-
-    return api.put(
-        `/questions/${id}`,
-        question
-    );
-
+// Update question
+export const updateQuestion = async (id, question) => {
+  return await api.put(`/questions/update/${id}`, question);
 };
 
-
-
-
-// Delete question (Admin)
-
-export const deleteQuestion = (id) => {
-
-    return api.delete(
-        `/questions/${id}`
-    );
-
-};
-
-
-
-
-// Submit quiz result
-
-export const submitQuizResult = (result) => {
-
-    return api.post(
-        "/results/add",
-        result
-    );
-
-};
-
-
-
-
-// Get leaderboard
-
-export const getLeaderboard = () => {
-
-    return api.get(
-        "/results/leaderboard"
-    );
-
+// Delete question
+export const deleteQuestion = async (id) => {
+  return await api.delete(`/questions/delete/${id}`);
 };

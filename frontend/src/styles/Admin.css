@@ -1,0 +1,55 @@
+.admin-container {
+  width: 90%;
+  margin: 30px auto;
+  font-family: Arial, sans-serif;
+}
+
+.admin-container h1,
+.admin-container h2 {
+  text-align: center;
+}
+
+.admin-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.admin-form input {
+  padding: 10px;
+}
+
+.admin-form button {
+  grid-column: span 2;
+  padding: 12px;
+  background: #3498db;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th,
+table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+
+table th {
+  background: #3498db;
+  color: white;
+}
+
+table button {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+}

@@ -1,370 +1,164 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-
-import api from "../services/api";
-
+import { registerUser } from "../services/authService";
 import "../styles/Register.css";
 
-
 function Register() {
+  const navigate = useNavigate();
 
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    password: "",
+    role: "STUDENT",
+  });
 
-    const navigate = useNavigate();
+  const handleChange = (e) => {
+    setUser({
+      ...user,
+      [e.target.name]: e.target.value,
+    });
+  };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
+    try {
+      const response = await registerUser(user);
 
-    const [name, setName] = useState("");
+      alert("Registration Successful!");
 
-    const [email, setEmail] = useState("");
+      console.log(response.data);
 
-    const [password, setPassword] = useState("");
+      // Clear form
+      setUser({
+        name: "",
+        email: "",
+        password: "",
+        role: "STUDENT",
+      });
 
+      // Redirect to Login page
+      navigate("/login");
 
+    } catch (error) {
+      console.error(error);
 
-    const [error, setError] = useState("");
+      if (error.response) {
+        alert(error.response.data.message || "Registration Failed!");
+      } else {
+        alert("Unable to connect to the server.");
+      }
+    }
+  };
 
-    const [success, setSuccess] = useState("");
+  return (
+  <div className="register-container">
 
+    <div className="register-card">
 
+      <div className="register-left">
 
+        <span className="badge">
+          🚀 Join QuizMaster
+        </span>
 
+        <h1>Create Your Account</h1>
 
+        <p>
+          Join thousands of students who are improving their knowledge through
+          interactive quizzes and performance tracking.
+        </p>
 
+        <div className="register-features">
 
-    const register = async (e) => {
+          <div className="register-feature">
+            📚 Unlimited Quizzes
+          </div>
 
+          <div className="register-feature">
+            🏆 Leaderboards
+          </div>
 
-        e.preventDefault();
-
-
-
-        setError("");
-
-        setSuccess("");
-
-
-
-        try {
-
-
-
-            await api.post(
-
-                "/users/register",
-
-                {
-
-                    name,
-
-                    email,
-
-                    password,
-
-                    role:"USER"
-
-                }
-
-            );
-
-
-
-
-            setSuccess(
-
-                "Registration Successful! Redirecting..."
-
-            );
-
-
-
-            setTimeout(()=>{
-
-
-                navigate("/");
-
-
-            },1500);
-
-
-
-
-        }
-
-        catch(error){
-
-
-
-            setError(
-
-                "Registration Failed. Email may already exist."
-
-            );
-
-
-
-        }
-
-
-    };
-
-
-
-
-
-
-
-
-    return (
-
-
-        <div className="register-page">
-
-
-
-            <div className="register-container">
-
-
-
-                <h1>
-
-                    Online Quiz
-
-                </h1>
-
-
-
-                <h2>
-
-                    Register
-
-                </h2>
-
-
-
-
-
-
-
-                {
-
-                error &&
-
-                (
-
-                    <div className="error-message">
-
-                        {error}
-
-                    </div>
-
-                )
-
-                }
-
-
-
-
-
-
-
-
-                {
-
-                success &&
-
-                (
-
-                    <div className="success-message">
-
-                        {success}
-
-                    </div>
-
-                )
-
-                }
-
-
-
-
-
-
-
-                <form onSubmit={register}>
-
-
-
-                    <input
-
-
-                        className="register-input"
-
-
-                        type="text"
-
-
-                        placeholder="Enter Name"
-
-
-                        value={name}
-
-
-                        onChange={(e)=>
-
-                            setName(e.target.value)
-
-                        }
-
-
-                        required
-
-
-                    />
-
-
-
-
-
-
-
-
-                    <input
-
-
-                        className="register-input"
-
-
-                        type="email"
-
-
-                        placeholder="Enter Email"
-
-
-                        value={email}
-
-
-                        onChange={(e)=>
-
-                            setEmail(e.target.value)
-
-                        }
-
-
-                        required
-
-
-                    />
-
-
-
-
-
-
-
-
-
-
-                    <input
-
-
-                        className="register-input"
-
-
-                        type="password"
-
-
-                        placeholder="Enter Password"
-
-
-                        value={password}
-
-
-                        onChange={(e)=>
-
-                            setPassword(e.target.value)
-
-                        }
-
-
-                        required
-
-
-                    />
-
-
-
-
-
-
-
-
-
-                    <button
-
-
-                        className="register-button"
-
-
-                        type="submit"
-
-
-                    >
-
-                        Register
-
-
-                    </button>
-
-
-
-
-
-                </form>
-
-
-
-
-
-
-
-
-                <p className="register-link">
-
-
-
-                    Already have an account?
-
-
-
-                    <Link to="/">
-
-
-                        Login
-
-
-                    </Link>
-
-
-
-                </p>
-
-
-
-
-
-            </div>
-
-
-
+          <div className="register-feature">
+            📈 Performance Analytics
+          </div>
 
         </div>
 
+      </div>
 
-    );
+      <div className="register-right">
 
+        <h2>Create Account</h2>
 
+        <p className="subtitle">
+          Fill in your details to get started
+        </p>
+
+        <form onSubmit={handleSubmit}>
+
+          <label>Full Name</label>
+
+          <input
+            type="text"
+            name="name"
+            placeholder="Enter your name"
+            value={user.name}
+            onChange={handleChange}
+            required
+          />
+
+          <label>Email Address</label>
+
+          <input
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            value={user.email}
+            onChange={handleChange}
+            required
+          />
+
+          <label>Password</label>
+
+          <input
+            type="password"
+            name="password"
+            placeholder="Enter your password"
+            value={user.password}
+            onChange={handleChange}
+            required
+          />
+
+          <label>Role</label>
+
+          <select
+            name="role"
+            value={user.role}
+            onChange={handleChange}
+          >
+            <option value="STUDENT">Student</option>
+            <option value="ADMIN">Admin</option>
+          </select>
+
+          <button type="submit">
+            Create Account
+          </button>
+
+        </form>
+
+        <p className="register-link">
+          Already have an account?
+          <Link to="/login"> Login</Link>
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+);
 }
-
-
 
 export default Register;
