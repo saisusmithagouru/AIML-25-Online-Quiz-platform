@@ -18,10 +18,24 @@ function Quiz() {
   const [questions, setQuestions] = useState([]);
   const [currentQuestion, setCurrentQuestion] = useState(0);
   const [answers, setAnswers] = useState({});
+  const [startTime] = useState(new Date());
 
   useEffect(() => {
     fetchQuestions();
   }, []);
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+
+    for (let i = shuffled.length - 1; i > 0; i--) {
+
+        const j = Math.floor(Math.random() * (i + 1));
+
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+
+    }
+
+    return shuffled;
+};
 
   const fetchQuestions = async () => {
     try {
@@ -33,7 +47,20 @@ function Quiz() {
         response = await getAllQuestions();
       }
 
-      setQuestions(response.data);
+      const shuffledQuestions = shuffleArray(response.data).map((question) => ({
+
+    ...question,
+
+    options: shuffleArray([
+        question.option1,
+        question.option2,
+        question.option3,
+        question.option4
+    ])
+
+}));
+
+setQuestions(shuffledQuestions);
     } catch (error) {
       console.error("Error loading questions:", error);
       alert("Failed to load questions.");
@@ -58,23 +85,40 @@ function Quiz() {
       setCurrentQuestion(currentQuestion - 1);
     }
   };
+const submitQuiz = async () => {
+  let correct = 0;
+let wrong = 0;
+let skipped = 0;
 
-  const submitQuiz = async () => {
+questions.forEach((question, index) => {
 
-    let correct = 0;
+    if (answers[index] === undefined) {
 
-    questions.forEach((question, index) => {
+        skipped++;
 
-        if (answers[index] === question.rightAnswer) {
-            correct++;
-        }
+    } else if (answers[index] === question.rightAnswer) {
 
-    });
+        correct++;
 
-    const total = questions.length;
-    const wrong = total - correct;
+    } else {
+
+        wrong++;
+
+    }
+
+});
+
+const total = questions.length;
     const percentage =
         total > 0 ? Math.round((correct / total) * 100) : 0;
+        const endTime = new Date();
+
+const timeTaken = Math.floor((endTime - startTime) / 1000);
+
+const minutes = Math.floor(timeTaken / 60);
+
+const seconds = timeTaken % 60;
+        const status = percentage >= 40 ? "PASS" : "FAIL";
 
     const user = JSON.parse(localStorage.getItem("user"));
 
@@ -107,7 +151,11 @@ function Quiz() {
         total,
         correct,
         wrong,
-        percentage
+        skipped,
+        percentage,
+        status,
+        timeTaken: `${minutes} min ${seconds} sec`,
+        quizDate: new Date().toLocaleDateString()
     }
 });
     
@@ -128,6 +176,7 @@ function Quiz() {
 }
 
   const question = questions[currentQuestion];
+  
 
   return (
     <>
@@ -160,12 +209,7 @@ Question {currentQuestion+1} of {questions.length}
 
 <div className="options">
 
-{[
-question.option1,
-question.option2,
-question.option3,
-question.option4
-].map((option,index)=>(
+{question.options.map((option,index)=>(
 
 <label
 key={index}

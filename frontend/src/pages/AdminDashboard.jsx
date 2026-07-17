@@ -4,7 +4,8 @@ FaJava,
 FaPython,
 FaDatabase,
 FaRobot,
-FaList
+FaList,
+FaChartBar
 } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { getAdminDashboard } from "../services/adminService";
@@ -190,6 +191,33 @@ Manage Questions
 <p>
 
 View & Delete
+
+</p>
+
+</div>
+<div
+className="admin-card"
+onClick={() => navigate("/analytics")}
+>
+
+<div
+className="admin-icon"
+style={{ background: "#2563eb" }}
+>
+
+<FaChartBar/>
+
+</div>
+
+<h2>
+
+Analytics
+
+</h2>
+
+<p>
+
+View Quiz Reports
 
 </p>
 

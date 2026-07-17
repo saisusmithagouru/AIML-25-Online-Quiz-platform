@@ -200,15 +200,15 @@ const loadDashboardStats = async () => {
 
         <button
 
-        onClick={()=>navigate("/leaderboard")}
+onClick={()=>navigate("/results")}
 
-        >
+>
 
-        View
+View
 
-        <FaArrowRight/>
+<FaArrowRight/>
 
-        </button>
+</button>
 
         </motion.div>
 

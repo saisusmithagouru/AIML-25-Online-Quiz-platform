@@ -72,7 +72,7 @@ if (response.data.role === "ADMIN") {
 
     <div className="login-features">
 
-    <div className="login-feature">
+    <div className="feature">
             ✅ Instant Results
         </div>
 

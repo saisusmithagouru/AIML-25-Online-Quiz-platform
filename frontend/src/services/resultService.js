@@ -12,3 +12,6 @@ export const getLeaderboard = () => {
 export const getDashboardStats = (studentName) => {
     return axios.get(`${API}/dashboard/${studentName}`);
 };
+export const getStudentResults = (studentName) => {
+    return axios.get(`${API}/student/${studentName}`);
+};

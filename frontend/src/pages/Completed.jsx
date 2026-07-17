@@ -14,7 +14,7 @@ function Completed() {
         return null;
     }
 
-    const { total, correct, percentage } = state;
+    const { total, correct, wrong, percentage, status } = state;
 
     return (
         <>
@@ -52,6 +52,13 @@ function Completed() {
                             <span>Correct</span>
 
                         </div>
+                        <div className="info">
+
+                           <h2>{wrong}</h2>
+
+                             <span>Wrong</span>
+
+                        </div>
 
                         <div className="info">
 
@@ -60,6 +67,11 @@ function Completed() {
                             <span>Score</span>
 
                         </div>
+                        <div className={`status-box ${status === "PASS" ? "pass" : "fail"}`}>
+
+    {status === "PASS" ? "🎉 PASS" : "❌ FAIL"}
+
+</div>
 
                     </div>
 

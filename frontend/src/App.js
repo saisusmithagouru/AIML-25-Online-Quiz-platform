@@ -14,6 +14,8 @@ import Completed from "./pages/Completed";
 import AdminDashboard from "./pages/AdminDashboard";
 import AddQuestion from "./pages/AddQuestion";
 import ManageQuestions from "./pages/ManageQuestions";
+import ResultsHistory from "./pages/ResultsHistory";
+import Analytics from "./pages/Analytics";
 
 function App() {
   return (
@@ -29,11 +31,14 @@ function App() {
         <Route path="/quiz-categories" element={<QuizCategories />} />
         <Route path="/about" element={<About />} />
 
+
 <Route path="/leaderboard" element={<Leaderboard />} />
 <Route path="/completed" element={<Completed />} />
 <Route path="/admin-dashboard" element={<AdminDashboard/>}/>
 <Route path="/add-question"element={<AddQuestion/>}/>
 <Route path="/manage-questions" element={<ManageQuestions/>}/>
+<Route path="/results" element={<ResultsHistory />} />
+<Route path="/analytics" element={<Analytics />} />
       </Routes>
     </BrowserRouter>
   );
